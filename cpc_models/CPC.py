@@ -1,4 +1,4 @@
-from cpc_models.InfoNCE_Loss import InfoNCE_Loss
+from cpc_models.InfoNCE_Loss import InfoNCE_Loss, PositionalPredictiveLoss
 
 import torch
 import torch.nn as nn
@@ -22,7 +22,7 @@ class CPC(nn.Module):
         neg_samples (int): number of negative samples to be used for contrastive loss
     """
 
-    def __init__(self, encoderNet, arNet, pred_directions, pred_steps, neg_samples):
+    def __init__(self, encoderNet, arNet, pred_directions, pred_steps, neg_samples, grid_size):
         super().__init__()
         
         self.pred_directions = pred_directions
@@ -36,7 +36,10 @@ class CPC(nn.Module):
 
         # Define Predictive + Loss Networks
         self.pred_loss = nn.ModuleList(
-            InfoNCE_Loss(pred_steps=pred_steps, neg_samples=neg_samples, in_channels=encoderNet.encoding_size)
+            PositionalPredictiveLoss(pred_steps=pred_steps,
+                                     neg_samples=neg_samples,
+                                     in_channels=encoderNet.encoding_size,
+                                     grid_size=grid_size)
             for _ in range(self.pred_directions)
         )
 

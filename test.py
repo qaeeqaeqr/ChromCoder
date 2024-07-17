@@ -502,7 +502,7 @@ class Paper(object):
 
 
 if __name__ == '__main__':
-    detector = PatchDetector()
-    detector.build()
-    patchwise_anomaly_detection_test_G(target='fp', tolarance=1)
-    patchwise_anomaly_detection_test_G(target='fn', tolarance=1)
+    num = 0
+    for folder_name in os.listdir('/shared/users/cuit/wy/dtst/patched_single_data'):
+        num += len(os.listdir(os.path.join('/shared/users/cuit/wy/dtst/patched_single_data', folder_name)))
+    print(num)

@@ -103,12 +103,12 @@ class CMS_ImageFolder(ImageFolder):
             return super().__getitem__(index)
 
         except Exception as e:
-            print(e)
-            raise ValueError(f"Error sample path: {self.imgs[index][0]}")
+            # 训练过程可能出现FileNotFound Error，所以跳过。
+            return super().__getitem__(index+1)
 
 
 def get_stl10_dataloader(args, is_labeled):
-    root_path = '/home/kms/wangyu_dtst/cms_patched_single_data_200k'
+    root_path = '/shared/users/cuit/wy/dtst/patched_single_data'
     train_size = 0.8
 
     transform = transforms.Compose(

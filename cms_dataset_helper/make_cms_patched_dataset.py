@@ -36,8 +36,8 @@ def process_single_img(img, img_path=None):
     return new_img.astype(dtype=np.uint8)
 
 
-def make_patched_dataset(src_path='/home/kms/wangyu_dtst/single_data_200k/single_data_200k',
-                         dst_path='/home/kms/wangyu_dtst/cms_patched_single_data_200k'):
+def make_patched_dataset(src_path='/shared/users/cuit/wy/dtst/taiwan_huaxi_40w',
+                         dst_path='/shared/users/cuit/wy/dtst/patched_single_data'):
     print('Initializing destination directory..\n')
     dst_path_init(dst_path)
     num_finished = 0
@@ -49,15 +49,19 @@ def make_patched_dataset(src_path='/home/kms/wangyu_dtst/single_data_200k/single
 
         img_names = os.listdir(sub_src_path)
         for img_name in img_names:  # for each image in specific number of chromosome
-            img_src_path = os.path.join(sub_src_path, img_name)
-            img_dst_path = os.path.join(sub_dst_path, img_name)
+            # 跳过一些taiwan数据
+            if img_name[0] != 'G':
+                pass
+            else:
+                img_src_path = os.path.join(sub_src_path, img_name)
+                img_dst_path = os.path.join(sub_dst_path, img_name)
 
-            img = cv2.imread(img_src_path)
-            try:
-                new_img = process_single_img(img, img_src_path)
-                plt.imsave(img_dst_path, new_img)
-            except Exception as e:
-                num_error_sample += 1
+                img = cv2.imread(img_src_path)
+                try:
+                    new_img = process_single_img(img, img_src_path)
+                    plt.imsave(img_dst_path, new_img)
+                except Exception as e:
+                    num_error_sample += 1
 
             num_finished += 1
             if num_finished % 100 == 0:

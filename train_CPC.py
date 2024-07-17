@@ -1,6 +1,6 @@
 
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 from cpc_models.CPC import CPC
 from cpc_models.MobileNetV2_Encoder import MobileNetV2_Encoder    
@@ -136,7 +136,7 @@ if __name__ == "__main__":
     ar = PixelCNN(in_channels=enc.encoding_size)
 
     # Define CPC Network
-    net = CPC(enc, ar, args.pred_directions, args.pred_steps, args.neg_samples)
+    net = CPC(enc, ar, args.pred_directions, args.pred_steps, args.neg_samples, args.grid_size)
     if args.trained_epochs:
         net.load_state_dict(torch.load(
             f"{cpc_path}_{args.encoder}_crop{args.crop}{colour}_grid{args.grid_size}_{args.norm}Norm_{args.pred_directions}dir_aug{args.patch_aug}_{args.trained_epochs}{args.model_name_ext}.pt"))
