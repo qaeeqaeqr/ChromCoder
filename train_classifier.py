@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 from cpc_models.MobileNetV2_Encoder import MobileNetV2_Encoder
 from cpc_models.ResNetV2_Encoder import PreActResNetN_Encoder

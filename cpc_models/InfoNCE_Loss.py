@@ -5,7 +5,6 @@ import torch.nn.functional as F
 
 
 class InfoNCE_Loss(nn.Module):
-    # NOTE: 在grid*grid中，只有第一列是有信息的，其它列全是空白的patch。应该让模型只在第一列上进行预测任务。
     """Performs predictions and InfoNCE Loss
     Args:
         pred_steps (int): number of steps into the future to perform predictions
@@ -19,7 +18,7 @@ class InfoNCE_Loss(nn.Module):
         self.pred_steps = pred_steps
         self.neg_samples = neg_samples
 
-        self.W_k = nn.ModuleList(  # 对grid*grid*encoding_size的encoder输出进行卷积
+        self.W_k = nn.ModuleList(
             nn.Conv2d(in_channels, in_channels, 1, bias=False)
             for _ in range(self.pred_steps)
         )
@@ -138,7 +137,7 @@ class PositionalPredictiveLoss(nn.Module):
         self.pred_steps = pred_steps
         self.neg_samples = neg_samples
 
-        self.W_k = nn.ModuleList(  # 对grid*grid*encoding_size的encoder输出进行卷积
+        self.W_k = nn.ModuleList(
             nn.Conv2d(in_channels, in_channels, 1, bias=False)
             for _ in range(self.pred_steps)
         )

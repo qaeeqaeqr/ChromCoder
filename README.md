@@ -1,4 +1,8 @@
-# Contrastive Predictive Coding for Chromosome anomaly detection
+# ChromCoder
+
+> This is the official implementation of the paper
+> "ChromCoder: Towards Novel Chromosome Representation
+> for Chromosomal Structural Abnormality Detection"
 
 ### Introduction
 
@@ -6,11 +10,13 @@
 
 ### Installation
 
-首先创建python=3.8的环境。如果用conda，运行下面指令。
+First, create an environment with python=3.8. 
+If using conda, run the following command.
 
-``conda create -n cpc python=3.8``
+``conda create -n ChromCoder python=3.8``
 
-然后运行下面这两条指令
+Then switch to the ChromCoder environment, 
+and run the following two commands.
 
 ``pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu118``
 
@@ -18,11 +24,13 @@
 
 ### Usage
 
-API被封装在了[anomaly_detection.py](anomaly_detection.py)中
-使用示例如下：
+API for abnormality detection is encapsulated in
+[anomaly_detection.py](anomaly_detection.py).
+And here is an example.
+
 ```python
 import os
-# 指定可用的GPU号
+
 os.environ['CUDA_VISIBLE_DEVICES'] = 'X'  
 
 from anomaly_detection import PatchDetector
@@ -32,33 +40,76 @@ detector.build(use_gpu=True)
 
 result = detector.detect(img1, 
                          img2, 
-                         n,  # 染色体号数
-                         ctype='G',  # 染色体类型（G、A、L）
+                         n,  
+                         ctype='G',  
                          use_gpu=True)
 ```
 
-需要在应用前创建PatchDetector类的实例，然后调用build方法以加载训练好的参数到GPU上，
-然后调用run方法获得检测结果。
+Before applying, you need to create an 
+instance of the PatchDetector class. Then, 
+call the build method to load the trained 
+parameters onto the GPU, and finally, call 
+the run method to obtain the detection results.
 
-### Preparation
 
-在本项目下没有模型时，运行下面四步以获得模型和阈值文件。
-获得模型和阈值文件后即可异常检测。
+### Pretraining PatchCoder & Preparing Ab-detector
 
-1. 运行[train_CPC.py](train_CPC.py)对 PatchCoder
-进行预训练，得到TrainedModels/stl10文件夹下的模型文件。
-（预训练用的数据集需要是经过cms_patch处理的，处理脚本见
-[here](cms_dataset_helper/make_cms_patched_dataset.py)）
+To perform anomaly detection without an 
+existing model in this project, follow 
+the four steps below to obtain the model 
+and threshold files. Once you have the model 
+and threshold files, you can proceed with 
+anomaly detection.
 
-2. (可选) 运行[train_classifier.py](train_classifier.py)
-测试PatchCoder中backbone的linear-probing效果，
-即测试backbone特征提取的有效性。
+1.Run [train_CPC.py](train_CPC.py) to 
+pre-train PatchCoder, generating model 
+files in the TrainedModels/stl10 directory. 
+(The dataset used for pre-training needs to 
+be processed with 
+[ChromPatcher](cms_dataset_helper/make_cms_patched_dataset.py).
+)
 
-3. 调用[anomaly_detection.py](anomaly_detection.py)
-中的_save_similarities_between_normal_patch_X
-函数获得数据集上所有成对染色体的相似度的统计数据（X=G,A,L），
-得到根目录下的统计数据文件。
+2.(Optional) Run 
+[train_classifier.py](train_classifier.py) to 
+test the linear probing performance of the 
+PatchCoder's backbone, which evaluates the 
+effectiveness of feature extraction by the 
+backbone.
 
-4. 调用[anomaly_detection.py](anomaly_detection.py)
-中的_save_patch_thresholds_X函数来获得阈值T，
-得到根目录下的阈值文件（X=G,A,L）。
+3.Call the 
+``_save_similarities_between_normal_patch_X ``
+function in 
+[anomaly_detection.py](anomaly_detection.py) 
+to obtain statistical data on the similarities 
+between all pairs of chromosomes in the dataset 
+(X=G,A,L), generating statistical data 
+files in the root directory.
+
+Note that chromosomes are divided into G, A, and L
+according to their length. Therefore, three 
+different threshold matrix are needed for G, A,
+and L individually.
+
+4.Call the ``_save_patch_thresholds_X`` 
+function in [anomaly_detection.py](anomaly_detection.py) 
+to obtain the threshold T, generating threshold
+files in the root directory (X=G,A,L).
+
+### Namings & Tricks
+
+Here we wish to clarify the connection between
+the naming of variables and files in our code 
+and the concepts discussed in the paper. 
+First, ChromPatcher corresponds to the 
+preprocessing of images and is encapsulated 
+in the CMS_Trans class. 
+Second, PatchCoder is encapsulated in the 
+CPC class. 
+Third, Ab-detector is encapsulated in 
+the PatchDetector class.
+
+Additionally, there is a very useful trick used
+in this project. Chromosome images are very
+different from the images in the real world.
+Therefore, we set the **Normalization Parameter**
+according to the feature of chromosome images.
